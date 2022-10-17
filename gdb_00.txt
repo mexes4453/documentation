@@ -1,0 +1,40 @@
+
+KNOW HOW
+
+$ bt					: backtrace to see the location of error occurence. print callstack
+$ continue (c)				: run from current position in prog until it hits a breakpoint
+$ coredumpctl				: list all the core dumps on your machine and their location - 
+						var/lib/systemd/coredump- all cores are dumped in this location.
+$ delete 3				: delete breakpoint with id equal 3
+$ delete 				: without args deletes all breakpoints
+$ disassemble				: shows the executing code in assembly
+$ disass <func_name>			: disassembles a func into assembly code
+$ finish				: tell gdb to stop after executing a function call program
+$ gdb ./a.out core_file			: debug the program by starting it with the core dump file
+$ gdb --args <prog_name> <arg1> <arg2>	: run gdb to execute programs with Arguments
+$ info breakpoints			: show all the breakpoint set so far
+$ info frame				: show the call trace of the function calls in the stack.
+$ info func				: list all the function addresses in the program.
+$ info register r0			: show the content of R0 register
+$ info regs				: show all the registers
+$ info stack				: show the call trace of the stack
+$ layout asm				: show the codes in asm
+$ layout regs				: show all registers above the instruction pane
+$ refresh				: render the debug program page when display gets scrambled
+$ stepi					: highlight the next line and execute the curent instruction
+$ step					: step into a function
+$ sudo apt install systemd-coredump	: install the app to enable core dumping.
+$ ulimit -c				: show the maximum limit for core dump file size  (default size -> 0 bytes )
+$ ulimit -c unlimited			: set the core dump file size to unlimited
+$ watch x				: gdb watch the variable and reports when the variable x changes
+$ what idx				: returns the data type of idx 
+$ x/10xw 0x55555558fef0			: print the content of 10 addresses from the given mem addr in hex format
+$ x/i	$pc				: examine instruction at progrm counter register -
+						-> it shows the instructioin addr that cause a SIGSEGV
+$ x/s    0x55555558fef0			: print the content of given address in string format.
+
+						
+
+SHORTCUTS
+ctrl+x, o				: allow toggle between instruction and register pane and scroll
+					  

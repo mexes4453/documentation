@@ -1,0 +1,154 @@
+https://www.youtube.com/watch?v=B7oKdUvRhQQ&list=PLERTijJOmYrDiiWd10iRHY0VRHdJwUH4g&index=4
+
+COMMANDS
+	ENTRY
+	MEMORY
+	SECTIONS
+	KEEP
+	ALIGN
+	AT>
+	.	(LOCATION COUNTER)
+	SYMBOL
+
+DESCRIPTION
+-----------
+	ENTRY -> This commands is used to set the "entry point addr" in the header
+		 of final elf file generated.
+		 - > 	The entry point addr corresponds to the address of the reset handler.
+			which is the first function the debugger executes after the
+			processor reset is initiated.
+		-> SYNTAX : ENTRY(_SYMBOL_NAME_)
+		-> EXAMPLE: ENTRY(Reset_Handler)
+ 	
+
+MEMORY
+	-> This command describes the memory regions available on the mcu target and further info
+	   which includes the start address and memory size.
+	-> The linker script used the information to place text or data defined by sections
+	   into their required memory type(heap, stack, ram, rom) and location.
+	-> The memory information provided is used to compute the application code size
+	   and ascertain if its code size fits into the memory size available on the mcu target.
+	-> This command allows user to easily reassign or finetune or resize the various 
+	   memory region (data, code, or heap, stack) size on the mcu target. 
+	-> The linker script should have only one MEMORY command within.
+
+	SYNTAX: it contains label, origin and length
+
+	MEMORY
+	{
+		name(attr):ORIGIN=origin, LENGTH=len
+	}
+
+	___________
+	DESCRIPTION
+	-----------
+	name(attr)	: label, define the name of the memory region and it is used to refer
+			  to the memory region throughout the linker script.
+			:(attr) 
+			------
+			The attr should be one of the charachters "ALIRWX"
+			where
+				A - allocated sections
+				L - same as I (initialized sections)
+				I - initialised section
+				R - Read-only section
+				W - Read and write section
+				X - section containing executable code.
+				! - use to invert the sense of any attr
+			*Note : two or more attributes can be combined. 	
+
+	ORIGIN=origin	: assigns the starting address of the memory region. 0x20000002
+	LENGTH=len	: assigns the size of the memory region. 1024K
+	
+
+
+------
+SYMBOL
+------
+	Symbols are names given to an address.
+	they are assigned similarly like variables in c applications.
+	The symbols can be exported for use within a C application.
+
+	EXAMPLE
+	-------
+	end_of_sram = 0x20004fff;	// end address of RAM
+
+
+
+
+-----------------------
+(.) -> LOCATION COUNTER
+----------------------
+	The location counter is denoted by the "." symbol. The linker script uses this
+	symbol to update location information within a section. Hence, enabling tracking
+	and boundary definition of various sections.
+
+	One can also set location counter to any specific value while writing the linker
+	script and it is incremented by the size of the output section.
+	The location counter (.) should only appear within the SECTIONS command.
+
+	At the beginning of each section, the location counter "." always equal to vma
+	which usually translates to be the starting address of that section in its
+	corresponding memory region.
+
+
+------
+ALIGN
+------
+	This command is a keyword used for aligning the address to end at (0, 4, 8, c) by
+	padding addresses that does not end with the list number with zero.
+
+
+
+--------
+SECTION
+-------
+	-> This command is used to create different output sections (.data, .text, .bss, .userdefined) in
+	   the final elf file.
+	-> it also controls the order in which the sections appears in the elf file by placing the sections
+	   in memory region using the labels defined in the MEMORY command. 
+	   Example: placing the .text section in the FLASH region which is defined within the MEMORY command.
+
+	SYNTAX
+	------
+	SECTIONS
+	{
+		//This section includes the .text section of all input files
+		.text:	// section name. it can be any name of choice
+		{
+			_stext = .;	/*
+					   use of location counter and symbol creation to capture start address
+					   Here, the location counter refers to vma which represents the
+					   start of the text section and text memory region which is 0x0000000.
+					   This is the starting address of the FLASH, depending on mcu.
+					*/
+			*(.isr_vector)	// merge all .isr_vector section of all input file
+			*(.text)	// merge all .text section of all input file
+			*(.text*)	// merge all .text section of all input file that matches the wildcard
+			*(.rodata)	// merge all .rodata section of all input file
+			. = ALIGN(4)	// align the location counter to an aligned address
+			_etext = .;	/*
+					   use of location counter and symbol creation to capture end address
+					   of the section.
+					   Here, the location counter refers to the last address that contains
+					   data within the text memory region.
+					*/
+					
+		}>(vma)AT>(lma)	/* provides memory location for section storage in memory.
+				   vma -> virtual memory address
+				   lma -> load memory address
+				   > FLASH (if vma and lma are same)
+				   > SRAM AT> FLASH ( if vma and lma are not same)
+				*/
+
+		//This section includes the .data section of all input files
+		.data:
+		{
+			*(.data)	// merge all data section of all input file
+			*(.data*)	// merge all .text section of all input file that matches the wildcard
+			. = ALIGN(4)	// align the location counter to an aligned address
+			_edata = .;   
+		}>(vma)AT>(lma)
+		
+	}
+
