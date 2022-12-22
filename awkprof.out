@@ -1,0 +1,8 @@
+	# gawk profile, created Wed Dec 16 14:56:42 2020
+
+	# BEGIN block(s)
+
+	BEGIN {
+		printf "Name = %s\n", name
+	}
+
